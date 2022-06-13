@@ -4,15 +4,19 @@ import "./Hackathon.sol";
 // import "@optionality.io/clone-factory/contracts/CloneFactory.sol";
 // import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
+import "hardhat/console.sol";
+
 contract Factory {
   Hackathon[] public _hackathons;
   event HackathonCreated(Hackathon hackathon);
-  function createHackathons( uint _max_team_size,
+  function createHackathon(
+        uint _max_team_size,
         uint _num_tracks,
         uint[3][] memory _prizes,
         address[] memory _judges,
         uint _judgeDate,
-        uint _endDate) public {
+        uint _endDate
+        ) public {
     Hackathon hackathon = new Hackathon(
         _max_team_size,
         _num_tracks,
@@ -22,6 +26,7 @@ contract Factory {
         _endDate
     );
     _hackathons.push(hackathon);
+    console.log(address(hackathon));
     emit HackathonCreated(hackathon);
   }
 }
