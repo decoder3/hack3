@@ -12,11 +12,11 @@ contract Factory {
   function createHackathon(
         uint _max_team_size,
         uint _num_tracks,
-        uint[3][] memory _prizes,
+        uint[] memory _prizes,
         address[] memory _judges,
         uint _judgeDate,
         uint _endDate
-        ) public {
+        ) public returns(address){
     Hackathon hackathon = new Hackathon(
         _max_team_size,
         _num_tracks,
@@ -26,7 +26,9 @@ contract Factory {
         _endDate
     );
     _hackathons.push(hackathon);
-    console.log(address(hackathon));
-    emit HackathonCreated(hackathon);
+    address hackathonAddress = address(hackathon);
+    console.log(hackathonAddress);
+    return hackathonAddress;
+    // emit HackathonCreated(hackathon);
   }
 }

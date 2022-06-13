@@ -5,6 +5,7 @@
 // Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
 const fs = require('fs')
+const { expect } = require("chai");
 
 async function main() {
   // let max_team_size = 5;
@@ -19,9 +20,23 @@ async function main() {
   await factory.deployed();
   console.log("Factory deployed to:", factory.address);
 
-  const tfactory = await Factory.attach(factory.address);
+  const hackathon = await factory.createHackathon(5,2,[100,200],[],1000000,2000000);
+  const w = await hackathon.wait();
+  console.log(w);
+  // let retVal = await hackathon.wait();
+  // console.log(retVal.events);
+  // const hackathonAddress = retVal.events[0].args.hackathonAddress;
+  // console.log("Hackathon deployed to:", hackathonAddress);
 
-  await tfactory.createHackathon(5,2,[[100,50,25],[200,100,50]],[],1000000,2000000)
+  // const tfactory = await Factory.attach(factory.address);
+
+  // let hackathonAddress = 0x0000000000000000000000000000000000000000;
+  // const hackathonAddress = await tfactory.createHackathon(5,2,[[100,50,25],[200,100,50]],[],1000000,2000000)
+  // await expect(tfactory.createHackathon(5,2,[[100,50,25],[200,100,50]],[],1000000,2000000))
+  //       .to.emit(tfactory, 'HackathonCreated')
+  //       .withArgs(hackathonAddress);
+  
+  // console.log(hackathonAddress);
 
   // console.log("Hackathon address:", hackathonAddress[0].args.hackathon);
 

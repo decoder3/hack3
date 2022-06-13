@@ -23,7 +23,7 @@ contract Hackathon{
     mapping(address => bool) public hasVotedOthers;
     mapping(address => bool[]) public hasVotedJudges;
 
-    uint[3][] public prizes;
+    uint[] public prizes;
 
     address public admin;
     address[] public judges;
@@ -34,7 +34,7 @@ contract Hackathon{
     constructor(
         uint _max_team_size,
         uint _num_tracks,
-        uint[3][] memory _prizes,
+        uint[] memory _prizes,
         address[] memory _judges,
         uint _judgeDate,
         uint _endDate
@@ -84,11 +84,13 @@ contract Hackathon{
             else{
                 // people
                 // TODO: check if the person holds people NFT or something
+                // for now we can allow anyone to vote
                 teams[team_idx].people_scores++;
             }
         }
     }
 
+    // this function was made considering there would we three prizes for each track
     function gettop3(uint[] memory arr) public pure returns(uint[3] memory){
         uint len = arr.length;
         require(len >= 3);
@@ -111,16 +113,43 @@ contract Hackathon{
         return ans;
     }
 
+    function getBest(uint[] memory arr) private pure returns(uint){
+        uint len = arr.length;
+        require(len >= 1);
+        uint mx = arr[0];
+        uint idx = 0;
+        for(uint i = 1; i < len; i++){
+            if(arr[i] > mx){
+                mx = arr[i];
+                idx = i;
+            }
+        }
+        return idx;
+    }
+
     function conclude() public {
         // TODO: give participants participation NFT or something
+        // require(block.timestamp > endDate);
 
-        // for(uint i = 0; i < num_tracks; i++){
-        //     uint[] memory tmp;
-        // }
-        
-        require(block.timestamp > endDate);
+        // ids of best teams in each track
+        uint[] memory best_teams = new uint[](num_tracks);
+        for(uint i = 0; i < num_tracks; i++){
+            uint[] memory scores = new uint[](teams.length);
+            for(uint j = 0; j < teams.length; j++){
+                scores[j] = teams[j].judge_scores[i];
+            }
+            best_teams[i] = getBest(scores);
+        }
+        // TODO: transfer money to the best teams in each track according to the prizes;
 
+        uint[] memory participant_scores = new uint[](teams.length);
+        uint[] memory people_scores = new uint[](teams.length);
+        for(uint i = 0; i < teams.length; i++){
+            participant_scores[i] = teams[i].participant_scores;
+            people_scores[i] = teams[i].people_scores;
+        }
+
+        uint participant_favourite = getBest(participant_scores);
+        uint people_favourite = getBest(people_scores);
     }
-    
-
 }
