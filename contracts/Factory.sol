@@ -16,7 +16,15 @@ contract Factory {
         address[] memory _judges,
         uint _judgeDate,
         uint _endDate
-        ) public returns(address){
+        ) public payable{
+    uint tmp = 0;
+    for(uint i = 0; i < _prizes.length; i++){
+        tmp += _prizes[i];
+    }
+    require(tmp <= msg.value);
+    
+    require(_max_team_size > 0 && _num_tracks > 0);
+    require(_judgeDate > block.timestamp && _endDate > _judgeDate);
     Hackathon hackathon = new Hackathon(
         _max_team_size,
         _num_tracks,
@@ -28,7 +36,6 @@ contract Factory {
     _hackathons.push(hackathon);
     address hackathonAddress = address(hackathon);
     console.log(hackathonAddress);
-    return hackathonAddress;
-    // emit HackathonCreated(hackathon);
+    emit HackathonCreated(hackathon);
   }
 }
