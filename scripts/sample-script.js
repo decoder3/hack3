@@ -21,8 +21,17 @@ async function main() {
   console.log("Factory deployed to:", factory.address);
 
   const hackathon = await factory.createHackathon(5,2,[100,200],[],1000000,2000000);
-  const w = await hackathon.wait();
-  console.log(w);
+  await hackathon.wait();
+
+  const hackathonAddress = await factory.getLatestHackathon();
+  console.log("hackathon deployed to:", hackathonAddress);
+
+  const MyNftFactory = await hre.ethers.getContractFactory("Test");
+  const myNft = await MyNftFactory.attach('0xB8dbd450Ae4667be85374991244a2F5171178976');
+  await myNft.makeAnEpicNFT();
+
+  console.log("called the nft");
+
   // let retVal = await hackathon.wait();
   // console.log(retVal.events);
   // const hackathonAddress = retVal.events[0].args.hackathonAddress;

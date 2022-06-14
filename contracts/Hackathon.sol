@@ -2,9 +2,12 @@
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
+import "@openzeppelin/contracts/interfaces/IERC721.sol";
 
 contract Hackathon{
     // address tokenMint =  ;
+
+    address NFTAddress = 0xB8dbd450Ae4667be85374991244a2F5171178976;
 
     struct Team{
         uint leader_idx;
@@ -30,6 +33,10 @@ contract Hackathon{
     uint public max_team_size;
     uint public num_tracks;
     uint public creation_time;
+
+    uint[] best_teams;
+    uint participant_favourite;
+    uint people_favourite;
     
     constructor(
         uint _max_team_size,
@@ -62,10 +69,14 @@ contract Hackathon{
         }
         console.log("team added successfully!!");
     }
+    
+    function doesHoldNFT(address _owner) public view returns(bool){
+        return IERC721(NFTAddress).balanceOf(_owner) > 0;
+    }
 
     // judge -> 0, participant -> 1, player -> 2;
     function vote(uint team_idx, uint track_idx) public {
-        require(block.timestamp > judgeDate && block.timestamp < endDate);
+        // require(block.timestamp > judgeDate && block.timestamp < endDate);
         require(team_idx < teams.length);
         uint voterCategory = person_category[msg.sender];
         if(voterCategory == 1){
@@ -83,15 +94,11 @@ contract Hackathon{
                 teams[team_idx].participant_scores++;
             }
             else{
-                // people
-                // TODO: check if the person holds people NFT or something
-                // for now we can allow anyone to vote
+                require(doesHoldNFT(msg.sender));
                 teams[team_idx].people_scores++;
             }
         }
     }
-
-
 
     function getBest(uint[] memory arr) private pure returns(uint){
         uint len = arr.length;
@@ -124,10 +131,9 @@ contract Hackathon{
 
     function conclude() public {
         require(block.timestamp > endDate);
-        // TODO: give participants participation NFT or something
 
         // ids of best teams in each track
-        uint[] memory best_teams = new uint[](num_tracks);
+        best_teams = new uint[](num_tracks);
         for(uint i = 0; i < num_tracks; i++){
             uint[] memory scores = new uint[](teams.length);
             for(uint j = 0; j < teams.length; j++){
@@ -147,30 +153,11 @@ contract Hackathon{
             people_scores[i] = teams[i].people_scores;
         }
 
-        uint participant_favourite = getBest(participant_scores);
-        uint people_favourite = getBest(people_scores);
+        participant_favourite = getBest(participant_scores);
+        people_favourite = getBest(people_scores);
     }
 
-    // this function was made considering there would we three prizes for each track
-    // function gettop3(uint[] memory arr) public pure returns(uint[3] memory){
-    //     uint len = arr.length;
-    //     require(len >= 3);
-    //     uint[] memory idx = new uint[](len);
-    //     for(uint i = 0; i < len; i++) idx[i] = i;
-    //     uint[3] memory ans;
-    //     for(uint i = 0; i < 3; i++){
-    //         for(uint j = i + 1; j < len; j++){
-    //             if(arr[j] > arr[i]){
-    //                 uint tmp = arr[j];
-    //                 arr[j] = arr[i];
-    //                 arr[i] = tmp;
-    //                 uint tidx = idx[j];
-    //                 idx[j] = idx[i];
-    //                 idx[i] = tidx;
-    //             }
-    //         }
-    //     }
-    //     for(uint i = 0; i < 3; i++) ans[i] = idx[i];
-    //     return ans;
-    // }
+    function getWinners() public view returns(uint[5] memory winners){
+        winners =  [best_teams[0], best_teams[1], best_teams[2], participant_favourite, people_favourite];
+    }
 }

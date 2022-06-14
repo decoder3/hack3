@@ -7,7 +7,7 @@ import "./Hackathon.sol";
 import "hardhat/console.sol";
 
 contract Factory {
-  Hackathon[] public _hackathons;
+  address[] public _hackathons;
   event HackathonCreated(Hackathon hackathon);
   function createHackathon(
         uint _max_team_size,
@@ -17,14 +17,13 @@ contract Factory {
         uint _judgeDate,
         uint _endDate
         ) public payable{
-    uint tmp = 0;
-    for(uint i = 0; i < _prizes.length; i++){
-        tmp += _prizes[i];
-    }
-    require(tmp <= msg.value);
-    
-    require(_max_team_size > 0 && _num_tracks > 0);
-    require(_judgeDate > block.timestamp && _endDate > _judgeDate);
+    // uint tmp = 0;
+    // for(uint i = 0; i < _prizes.length; i++){
+    //     tmp += _prizes[i];
+    // }
+    // require(tmp <= msg.value);
+    // require(_max_team_size > 0 && _num_tracks > 0);
+    // require(_judgeDate > block.timestamp && _endDate > _judgeDate);
     Hackathon hackathon = new Hackathon(
         _max_team_size,
         _num_tracks,
@@ -33,9 +32,14 @@ contract Factory {
         _judgeDate,
         _endDate
     );
-    _hackathons.push(hackathon);
+
     address hackathonAddress = address(hackathon);
+    _hackathons.push(hackathonAddress);
     console.log(hackathonAddress);
     emit HackathonCreated(hackathon);
+  }
+
+  function getLatestHackathon() public view returns(address){
+    return _hackathons[_hackathons.length - 1];
   }
 }

@@ -14,8 +14,9 @@ describe("Hackathon", function () {
     const hackathon = await Hackathon.deploy(max_team_size, num_tracks, prizes, judges, judgeDate, endDate);
 
     await hackathon.deployed();
-
     console.log("Hackathon deployed to:", hackathon.address);
+
+
     // expect(await greeter.greet()).to.equal("Hello, world!");
 
     // const setGreetingTx = await greeter.setGreeting("Hola, mundo!");
